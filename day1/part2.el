@@ -4,7 +4,9 @@
     (insert-file-contents file)
     (buffer-string)))
 
-(setq example_input "two1nine
+(setq example_input "eighthree
+sevenine
+two1nine
 eightwothree
 abcone2threexyz
 xtwone3four
@@ -12,13 +14,28 @@ xtwone3four
 zoneight234
 7pqrstsixteen")
 
-(setq input example_input)
-;;(setq input (file-to-string "input.txt"))
+;;(setq input "sevenine")
+;;(setq input example_input)
+(setq input (file-to-string "input.txt"))
 
 (setq rows (split-string input))
 
 (defun normalize-numbers (s)
-  ))
+  (let ((processed "")
+        (i 0))
+    (while (< i (length s))
+      (let* ((process (concat processed (substring s i (+ i 1))))
+            (prev-process process))
+        (dolist (num '(("one" . "1") ("two" . "2") ("three" . "3")
+                       ("four" . "4") ("five" . "5") ("six" . "6")
+                       ("seven" . "7") ("eight" . "8") ("nine" . "9")))
+          (setq process (replace-regexp-in-string (car num) (cdr num) process)))
+        (when (= (length process) (length prev-process))
+          (setq i (+ i 1)))
+        (setq processed process)))
+    processed))
+
+(setq normalized-rows (mapcar #'normalize-numbers rows))
 
 (defun take-numbers (s)
   (let ((n (read s)))
@@ -32,7 +49,7 @@ zoneight234
          (nums (mapcar #'take-numbers strings)))
     (seq-filter #'not-nullp nums)))
 
-(setq rows-numbers (mapcar #'to-chars rows))
+(setq rows-numbers (mapcar #'to-chars normalized-rows))
 
 (defun calc-calib-value (r)
   (let ((first (car r))
@@ -41,7 +58,7 @@ zoneight234
 
 (setq calib-values (mapcar #'calc-calib-value rows-numbers))
 
-(setq answer (seq-reduce #'+ calib-values 0))
+(dolist (e calib-values)
+  (print e))
 
-(setq foobar "onetwoone")
-(setq foobar (replace-regexp-in-string "one" "1" foobar))
+(setq answer (seq-reduce #'+ calib-values 0))
